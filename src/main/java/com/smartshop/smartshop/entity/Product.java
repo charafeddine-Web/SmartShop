@@ -1,19 +1,28 @@
 package com.smartshop.smartshop.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 @Data
 @Entity
+@Table(name = "products")
 public class Product {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
-    private String description;
-    private Double price;
-    private Integer stockQuantity;
 
+    @Column(length = 1000)
+    private String description;
+
+    @Column(nullable = false)
+    private BigDecimal price;
+
+    @Column(nullable = false)
+    private Integer stockQuantity;
 }
