@@ -589,8 +589,7 @@ src/main/java/com/microtech/smartshop/
 
 ## 👥 Contributeurs
 
-**Développeur** : [Votre Nom]  
-**Formateur** : [Nom du Formateur]  
+**Développeur** : charaf eddine
 **Client** : MicroTech Maroc  
 
 ---
@@ -600,18 +599,15 @@ src/main/java/com/microtech/smartshop/
 | Phase | Date |
 |-------|------|
 | Lancement | 24/11/2025 |
-| Développement | 24-27/11/2025 |
-| Tests finaux | 27/11/2025 |
-| **Livraison** | **28/11/2025** |
-| Soutenance | 28/11/2025 (45 min) |
+
 
 ---
 
 ## 📞 Support
 
 Pour toute question ou problème :
-- 📧 Email: support@microtech.ma
-- 📱 Téléphone: +212 XXX-XXXXXX
+- 📧 Email: charafeddinetbibzat]@gmail.com
+- 📱 Téléphone: +212 651928482
 
 ---
 
