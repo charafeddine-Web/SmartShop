@@ -1,26 +1,39 @@
 package com.smartshop.smartshop.entity;
 
 import com.smartshop.smartshop.entity.enums.OrderStatus;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
-import java.text.DecimalFormat;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
+@Table(name = "orders")
 public class Order {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long clientId;
-    private String orderDate;
-    private DecimalFormat subtotal;
-    private Double totalAmount;
-    private DecimalFormat discount;
-    private DecimalFormat TVA;
-    private DecimalFormat promoCode;
-    private DecimalFormat Total;
+    @ManyToOne
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
+
+    private LocalDateTime orderDate;
+
+    private BigDecimal subtotal;
+
+    private BigDecimal discount;
+
+    private BigDecimal tva;
+
+    private BigDecimal promoCode;
+
+    private BigDecimal total;
+
+    private BigDecimal remainingAmount;
+
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
-    private DecimalFormat remainingAmount;
 }

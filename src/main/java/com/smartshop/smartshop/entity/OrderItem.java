@@ -1,19 +1,30 @@
 package com.smartshop.smartshop.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 @Data
 @Entity
+@Table(name = "order_items")
 public class OrderItem {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long productId;
-    private Long orderId;
-    private Integer quantity;
-    private Double price;
-    private String totalLine;
 
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
+    @ManyToOne
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
+
+    private Integer quantity;
+
+    private BigDecimal price;
+
+    private BigDecimal totalLine;
 }
