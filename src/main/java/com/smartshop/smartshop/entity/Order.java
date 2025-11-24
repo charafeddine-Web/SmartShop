@@ -14,13 +14,13 @@ public class Order {
     private Long id;
 
     private Long clientId;
-    private String dateCommande;
-    private DecimalFormat sousTotal;
+    private String orderDate;
+    private DecimalFormat subtotal;
     private Double totalAmount;
-    private DecimalFormat remise;
+    private DecimalFormat discount;
     private DecimalFormat TVA;
-    private DecimalFormat codePromo;
-    private DecimalFormat totalGeneral;
+    private DecimalFormat promoCode;
+    private DecimalFormat Total;
     private OrderStatus status;
-    private DecimalFormat montantRestant;
+    private DecimalFormat remainingAmount;
 }

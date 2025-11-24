@@ -15,7 +15,7 @@ public class Client {
 
     private String email;
 
-    private String NiveauFidelity;
+    private String fidelityLevel;
 
 
 }

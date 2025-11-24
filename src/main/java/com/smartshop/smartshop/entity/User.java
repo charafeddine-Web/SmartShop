@@ -1,5 +1,6 @@
 package com.smartshop.smartshop.entity;
 
+import com.smartshop.smartshop.entity.enums.UserRole;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Data;
@@ -15,6 +16,6 @@ public class User {
 
     private String password;
 
-    private String role;
+    private UserRole role;
 
 }
