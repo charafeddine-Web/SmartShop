@@ -11,9 +11,6 @@ import java.math.BigDecimal;
 @Table(name = "clients")
 public class Client extends User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
 
     @Column(nullable = false, unique = true)
@@ -21,7 +18,6 @@ public class Client extends User {
 
     @Enumerated(EnumType.STRING)
     private CustomerTier fidelityLevel;
-
 
     private Integer totalOrders;
 
