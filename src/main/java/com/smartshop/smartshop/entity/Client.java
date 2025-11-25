@@ -11,16 +11,17 @@ import java.math.BigDecimal;
 @Table(name = "clients")
 public class Client extends User {
 
-
-
     @Column(nullable = false, unique = true)
     private String email;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private CustomerTier fidelityLevel;
 
-    private Integer totalOrders;
+    @Column(nullable = false)
+    private Integer totalOrders = 0;
 
-    private BigDecimal totalSpent;
+    @Column(nullable = false)
+    private BigDecimal totalSpent = BigDecimal.ZERO;
 
 }
