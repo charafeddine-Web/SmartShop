@@ -1,5 +1,7 @@
 package com.smartshop.smartshop.controller;
 
+import com.smartshop.smartshop.dto.LoginDTO;
+import com.smartshop.smartshop.dto.UserDto;
 import com.smartshop.smartshop.entity.User;
 import com.smartshop.smartshop.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,14 +19,13 @@ public class AuthController {
     private final UserRepository userRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String username,
-                        @RequestParam String password,
+    public ResponseEntity<?> login(@RequestBody LoginDTO logindto,
                         HttpServletRequest request) {
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(logindto.getUsername())
                 .orElse(null);
 
-        if (user == null || !user.getPassword().equals(password)) {
+        if (user == null || !user.getPassword().equals(logindto.getPassword())) {
             return ResponseEntity.badRequest().body("Invalid username or password");
         }
 
