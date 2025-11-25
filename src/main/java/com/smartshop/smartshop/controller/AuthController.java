@@ -17,11 +17,11 @@ public class AuthController {
     private final UserRepository userRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String email,
+    public ResponseEntity<?> login(@RequestParam String username,
                         @RequestParam String password,
                         HttpServletRequest request) {
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByUsername(username)
                 .orElse(null);
 
         if (user == null || !user.getPassword().equals(password)) {
