@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,4 +38,25 @@ public class ClientServiceImpl implements ClientService {
         Client client = clientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Client not found with id: " + id));
         return clientMapper.toDto(client);
     }
+
+    public List<ClientDto> getAllClients(){
+        List<Client> clients = clientRepository.findAll();
+        return clientMapper.toDto(clients);
+    };
+
+    public ClientDto updateClient(Long id, ClientDto dto){
+        Client client = clientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Client not found with id: " + id));
+        client.setUsername(dto.getUsername());
+        client.setEmail(dto.getEmail());
+        client.setFidelityLevel(dto.getFidelityLevel());
+        client.setTotalOrders(dto.getTotalOrders());
+        client.setTotalSpent(dto.getTotalSpent());
+        Client updated = clientRepository.save(client);
+        return clientMapper.toDto(updated);
+    };
+
+    public void deleteClient(Long id){
+        clientRepository.deleteById(id);
+    };
+
 }
