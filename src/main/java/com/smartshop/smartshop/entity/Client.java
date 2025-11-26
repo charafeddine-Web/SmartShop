@@ -9,7 +9,15 @@ import java.math.BigDecimal;
 @Data
 @Entity
 @Table(name = "clients")
-public class Client extends User {
+public class Client  {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "user_id" ,nullable = false)
+    private User user;
 
     @Column(nullable = false, unique = true)
     private String email;

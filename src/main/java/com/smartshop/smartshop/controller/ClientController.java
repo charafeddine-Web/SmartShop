@@ -1,14 +1,14 @@
 package com.smartshop.smartshop.controller;
 
 import com.smartshop.smartshop.dto.ClientDto;
+import com.smartshop.smartshop.entity.Client;
 import com.smartshop.smartshop.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/clients")
@@ -23,12 +23,27 @@ public class ClientController {
         return ResponseEntity.ok(client);
     }
 
-    @PostMapping("/get")
-    public ResponseEntity<?> getClientById(@RequestBody Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getClientById(@PathVariable Long id) {
         ClientDto client = clientService.getClientById(id);
         return ResponseEntity.ok(client);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<ClientDto>> getAllClients() {
+        return ResponseEntity.ok(clientService.getAllClients());
+    }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateClient(@PathVariable Long id, @Valid @RequestBody ClientDto dto) {
+        ClientDto updatedClient = clientService.updateClient(id, dto);
+        return ResponseEntity.ok(updatedClient);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteClient(@PathVariable Long id) {
+        clientService.deleteClient(id);
+        return ResponseEntity.ok("Client deleted successfully");
+    }
 
 }
