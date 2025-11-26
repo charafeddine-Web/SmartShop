@@ -1,14 +1,15 @@
 package com.smartshop.smartshop.dto;
-
+import com.smartshop.smartshop.dto.spec.Creation;
 import lombok.Data;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 @Data
 public class ProductDto {
+
     private Long id;
 
-    @NotBlank(message = "Product name must not be empty")
+//    @NotBlank(message = "Product name must not be empty")
     private String name;
 
     private String description;
@@ -22,4 +23,5 @@ public class ProductDto {
     private Integer stockQuantity;
 
     private Boolean deleted = false;
+
 }
