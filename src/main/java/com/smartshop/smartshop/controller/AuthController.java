@@ -4,6 +4,7 @@ import com.smartshop.smartshop.dto.LoginDTO;
 import com.smartshop.smartshop.dto.UserDto;
 import com.smartshop.smartshop.entity.User;
 import com.smartshop.smartshop.repository.UserRepository;
+import com.smartshop.smartshop.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -15,39 +16,27 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserRepository userRepository;
+    private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO,
-                                   HttpServletRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginDTO dto, HttpServletRequest request) {
 
-        User user = userRepository.findByUsername(loginDTO.getUsername())
-                .orElse(null);
-
-        if (user == null || !user.getPassword().equals(loginDTO.getPassword())) {
-            return ResponseEntity.status(401).body("Invalid username or password");
-        }
+        User user = authService.login(dto.getUsername(), dto.getPassword());
 
         HttpSession session = request.getSession(true);
         session.setAttribute("user", user);
 
-        UserDto dto = new UserDto();
-        dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
-        dto.setRole(user.getRole());
+        UserDto retdto = new UserDto();
+        retdto.setId(user.getId());
+        retdto.setUsername(user.getUsername());
+        retdto.setRole(user.getRole());
 
-        return ResponseEntity.ok(dto);
-    }
+        return ResponseEntity.ok(retdto);    }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
-
-        HttpSession session = request.getSession(false);
-
-        if (session != null) {
-            session.invalidate();
-        }
-
+        authService.logout(request.getSession(false));
         return ResponseEntity.ok("Logout successful");
     }
 }
+
