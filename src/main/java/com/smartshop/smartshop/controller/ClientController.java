@@ -1,11 +1,14 @@
 package com.smartshop.smartshop.controller;
 
 import com.smartshop.smartshop.dto.ClientDto;
+import com.smartshop.smartshop.dto.spec.Creation;
+import com.smartshop.smartshop.dto.spec.Update;
 import com.smartshop.smartshop.entity.Client;
 import com.smartshop.smartshop.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +21,7 @@ public class ClientController {
     private final ClientService clientService;
 
     @PostMapping("/save")
-    public ResponseEntity<?> addClient(@Valid @RequestBody ClientDto dto) {
+    public ResponseEntity<?> addClient(@Validated(Creation.class) @RequestBody ClientDto dto) {
         ClientDto client = clientService.addClient(dto);
         return ResponseEntity.ok(client);
     }
@@ -35,7 +38,7 @@ public class ClientController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateClient(@PathVariable Long id, @Valid @RequestBody ClientDto dto) {
+    public ResponseEntity<?> updateClient(@PathVariable Long id, @Validated(Update.class) @RequestBody ClientDto dto) {
         ClientDto updatedClient = clientService.updateClient(id, dto);
         return ResponseEntity.ok(updatedClient);
     }

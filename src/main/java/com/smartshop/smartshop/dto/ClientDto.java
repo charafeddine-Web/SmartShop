@@ -2,6 +2,7 @@ package com.smartshop.smartshop.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.smartshop.smartshop.dto.spec.Creation;
 import com.smartshop.smartshop.entity.enums.CustomerTier;
 import lombok.Data;
 
@@ -19,13 +20,14 @@ public class ClientDto {
     private String username;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @NotBlank(message = "password cannot be blank")
+    @NotBlank(groups = Creation.class,message = "password cannot be blank")
     private String password;
 
     @NotBlank(message = "Email cannot be blank")
     @Email(message = "Email must be valid")
     private String email;
 
+    @NotNull(groups = Creation.class, message = "Fidelity level cannot be null")
     private CustomerTier fidelityLevel;
 
     @NotNull(message = "Total orders cannot be null")
