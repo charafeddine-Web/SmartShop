@@ -5,7 +5,9 @@ import com.smartshop.smartshop.entity.Client;
 
 public interface ClientService {
 
-    public Client addClient(ClientDto dto);
+    public ClientDto addClient(ClientDto dto);
+
+    public ClientDto getClientById(Long id);
 
 }
 
