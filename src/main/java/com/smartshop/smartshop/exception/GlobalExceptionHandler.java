@@ -2,11 +2,14 @@ package com.smartshop.smartshop.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.OffsetDateTime;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -26,6 +29,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleBadRequest(BadRequestException ex, HttpServletRequest req) {
         return buildResponse(ex, HttpStatus.BAD_REQUEST, req);
     }
+
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ApiErrorResponse> handleUnauthorized(UnauthorizedException ex, HttpServletRequest req) {
@@ -52,4 +56,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleAll(Exception ex, HttpServletRequest req) {
         return buildResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, req);
     }
+//
+//
+//    @ExceptionHandler(MethodArgumentNotValidException.class)
+//    public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest req) {
+//        String msg = ex.getBindingResult().getFieldErrors().stream()
+//                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+//                .collect(Collectors.joining("; "));
+//        return buildResponse(new BadRequestException(msg), HttpStatus.BAD_REQUEST, req);
+//    }
+//
+//    @ExceptionHandler(HttpMessageNotReadableException.class)
+//    public ResponseEntity<ApiErrorResponse> handleUnreadable(HttpMessageNotReadableException ex, HttpServletRequest req) {
+//        return buildResponse(new BadRequestException("Malformed JSON request: " + ex.getMostSpecificCause().getMessage()), HttpStatus.BAD_REQUEST, req);
+//    }
 }

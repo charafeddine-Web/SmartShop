@@ -2,6 +2,7 @@ package com.smartshop.smartshop.service.impl;
 
 import com.smartshop.smartshop.dto.ProductDto;
 import com.smartshop.smartshop.entity.Product;
+import com.smartshop.smartshop.exception.BadRequestException;
 import com.smartshop.smartshop.exception.ResourceNotFoundException;
 import com.smartshop.smartshop.mapper.ProductMapper;
 import com.smartshop.smartshop.repository.ProductRepository;
@@ -21,14 +22,16 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
 
     @Override
-    @Transactional
     public ProductDto addProduct(ProductDto dto) {
-        Product toSave = productMapper.toEntity(dto);
-        // ensure deleted flag is false when creating
-        if (toSave.getDeleted() == null) toSave.setDeleted(false);
-        Product saved = productRepository.save(toSave);
+        Product product = productMapper.toEntity(dto);
+        if (product.getDeleted() == null) {
+            product.setDeleted(false);
+        }
+        Product saved = productRepository.save(product);
         return productMapper.toDto(saved);
     }
+
+
 
     @Override
     public ProductDto getProductById(Long id) {

@@ -5,7 +5,6 @@ import com.smartshop.smartshop.dto.spec.Creation;
 import com.smartshop.smartshop.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +17,7 @@ public class ProductController {
     private  final ProductService productService;
 
     @PostMapping("/save")
-    public ProductDto addProduct(@Validated(Creation.class) @RequestBody ProductDto dto){
+    public ProductDto addProduct(@Valid @RequestBody ProductDto dto){
         return productService.addProduct(dto);
     }
 

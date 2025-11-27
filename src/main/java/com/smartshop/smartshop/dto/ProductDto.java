@@ -24,4 +24,6 @@ public class ProductDto {
 
     private Boolean deleted = false;
 
+
+
 }
