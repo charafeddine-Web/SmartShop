@@ -39,8 +39,9 @@ public class ClientServiceImpl implements ClientService {
         client.setUser(savedUser);
         client.setEmail(dto.getEmail());
         client.setFidelityLevel(dto.getFidelityLevel() != null ? dto.getFidelityLevel() : CustomerTier.BASIC);
-        client.setTotalOrders(0);
-        client.setTotalSpent(BigDecimal.ZERO);
+        client.setTotalOrders(dto.getTotalOrders() != null ? dto.getTotalOrders() : 0);
+        client.setTotalSpent(dto.getTotalSpent() != null ? dto.getTotalSpent() : BigDecimal.ZERO);
+
 
         Client savedClient = clientRepository.save(client);
 

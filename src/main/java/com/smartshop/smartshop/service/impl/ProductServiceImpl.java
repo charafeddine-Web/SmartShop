@@ -1,6 +1,5 @@
 package com.smartshop.smartshop.service.impl;
 
-import com.smartshop.smartshop.dto.ClientDto;
 import com.smartshop.smartshop.dto.ProductDto;
 import com.smartshop.smartshop.entity.Product;
 import com.smartshop.smartshop.exception.ResourceNotFoundException;
@@ -9,6 +8,7 @@ import com.smartshop.smartshop.repository.ProductRepository;
 import com.smartshop.smartshop.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,20 +20,28 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
+    @Override
+    @Transactional
     public ProductDto addProduct(ProductDto dto) {
-        Product saved = productRepository.save(productMapper.toEntity(dto));
+        Product toSave = productMapper.toEntity(dto);
+        // ensure deleted flag is false when creating
+        if (toSave.getDeleted() == null) toSave.setDeleted(false);
+        Product saved = productRepository.save(toSave);
         return productMapper.toDto(saved);
     }
 
+    @Override
     public ProductDto getProductById(Long id) {
-        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found " + id));
+        Product product = productRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found " + id));
         return productMapper.toDto(product);
     }
 
-    ;
-
+    @Override
+    @Transactional
     public ProductDto updateProduct(Long id, ProductDto dto) {
-        Product existingProduct = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found " + id));
+        Product existingProduct = productRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found " + id));
         existingProduct.setName(dto.getName());
         existingProduct.setDescription(dto.getDescription());
         existingProduct.setPrice(dto.getPrice());
@@ -42,20 +50,20 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.toDto(updatedProduct);
     }
 
-    ;
-
+    @Override
+    @Transactional
     public void deleteProduct(Long id) {
-        Product existingProduct = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found " + id));
+        Product existingProduct = productRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found " + id));
         existingProduct.setDeleted(true);
         productRepository.save(existingProduct);
     }
 
+    @Override
     public List<ProductDto> getAllProducts() {
-        List<ProductDto> products = productRepository.findAll().stream()
-                .filter(p-> p.getDeleted().equals(false))
+        return productRepository.findByDeletedFalse().stream()
                 .map(productMapper::toDto)
-                .toList();
-        return products;
+                .collect(Collectors.toList());
     }
 
 }

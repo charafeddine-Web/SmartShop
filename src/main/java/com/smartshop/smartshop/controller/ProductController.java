@@ -20,27 +20,26 @@ public class ProductController {
     @PostMapping("/save")
     public ProductDto addProduct(@Validated(Creation.class) @RequestBody ProductDto dto){
         return productService.addProduct(dto);
-    };
+    }
 
-    @PostMapping("/get")
-    public ProductDto getProductById(Long id){
+    @GetMapping("/{id}")
+    public ProductDto getProductById(@PathVariable Long id){
         return productService.getProductById(id);
-    };
+    }
 
-    @PutMapping("/update")
-    public ProductDto updateProduct(Long id, ProductDto dto){
+    @PutMapping("/{id}")
+    public ProductDto updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDto dto){
         return productService.updateProduct(id, dto);
-    };
+    }
 
-    @PostMapping("/delete")
-    public void deleteProduct(Long id) {
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
-    };
+    }
 
-    @GetMapping("/all")
+    @GetMapping
     public List<ProductDto> getAllProducts() {
         return productService.getAllProducts();
     }
-
 
 }

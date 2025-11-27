@@ -27,7 +27,6 @@ public class ClientDto {
     @Email(message = "Email must be valid")
     private String email;
 
-    @NotNull(groups = Creation.class, message = "Fidelity level cannot be null")
     private CustomerTier fidelityLevel;
 
     @NotNull(message = "Total orders cannot be null")
