@@ -1,13 +1,13 @@
 package com.smartshop.smartshop.controller;
 
 import com.smartshop.smartshop.dto.ProductDto;
-import com.smartshop.smartshop.dto.spec.Creation;
 import com.smartshop.smartshop.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/products")
@@ -37,8 +37,8 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<ProductDto> getAllProducts() {
-        return productService.getAllProducts();
+    public Page<ProductDto> getAllProducts(Pageable pageable) {
+        return productService.getAllProducts( pageable);
     }
 
 }

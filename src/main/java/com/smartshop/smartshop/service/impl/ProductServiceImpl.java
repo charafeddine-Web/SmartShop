@@ -2,17 +2,16 @@ package com.smartshop.smartshop.service.impl;
 
 import com.smartshop.smartshop.dto.ProductDto;
 import com.smartshop.smartshop.entity.Product;
-import com.smartshop.smartshop.exception.BadRequestException;
 import com.smartshop.smartshop.exception.ResourceNotFoundException;
 import com.smartshop.smartshop.mapper.ProductMapper;
 import com.smartshop.smartshop.repository.ProductRepository;
 import com.smartshop.smartshop.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -62,11 +61,12 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(existingProduct);
     }
 
-    @Override
-    public List<ProductDto> getAllProducts() {
-        return productRepository.findByDeletedFalse().stream()
-                .map(productMapper::toDto)
-                .collect(Collectors.toList());
-    }
+        @Override
+        public Page<ProductDto> getAllProducts(Pageable pageable) {
+            Page<Product> page = productRepository.findByDeletedFalse(pageable);
+
+            return page.map(productMapper::toDto);
+        }
+
 
 }
