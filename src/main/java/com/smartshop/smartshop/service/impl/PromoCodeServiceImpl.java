@@ -33,13 +33,6 @@ public class PromoCodeServiceImpl implements PromoCodeService {
         return promoCodeMapper.toDto(promoCodeRepository.save(promo));
     }
 
-    @Override
-    public PromoCodeDto getByCode(String code) {
-        PromoCode promo = promoCodeRepository
-                .findByCodeAndAvailabilityStatusTrue(code)
-                .orElseThrow(() -> new ResourceNotFoundException("Promo code not found or unavailable: " + code));
-        return promoCodeMapper.toDto(promo);
-    }
 
     private String generateRandomCode() {
         Random random = new Random();

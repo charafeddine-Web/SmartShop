@@ -19,10 +19,5 @@ public class PromoCodeController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/{code}")
-    public ResponseEntity<PromoCodeDto> getByCode(@PathVariable String code) {
-        PromoCodeDto dto = promoCodeService.getByCode(code);
-        return ResponseEntity.ok(dto);
-    }
 
 }

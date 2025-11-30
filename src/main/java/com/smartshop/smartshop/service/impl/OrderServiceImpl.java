@@ -5,6 +5,7 @@ import com.smartshop.smartshop.dto.OrderItemDto;
 import com.smartshop.smartshop.entity.*;
 import com.smartshop.smartshop.entity.enums.CustomerTier;
 import com.smartshop.smartshop.entity.enums.OrderStatus;
+import com.smartshop.smartshop.entity.enums.PaymentStatus;
 import com.smartshop.smartshop.exception.BusinessRuleException;
 import com.smartshop.smartshop.exception.ResourceNotFoundException;
 import com.smartshop.smartshop.mapper.OrderItemMapper;
@@ -121,15 +122,16 @@ public class OrderServiceImpl implements OrderService {
 
         if (orderDto.getPromoCode() != null && !orderDto.getPromoCode().isBlank()) {
             PromoCode promo = promoCodeRepository
-                    .findByCodeAndAvailabilityStatusTrue(orderDto.getPromoCode())
+                    .findByCodeAndAvailabilityStatusFalse(orderDto.getPromoCode())
                     .orElseThrow(() -> new BusinessRuleException("Invalid or unavailable promo code"));
 
 
             BigDecimal promoValue = subtotal.multiply(BigDecimal.valueOf(0.05));
             discount = discount.add(promoValue);
             order.setPromoCode(promo);
+            promo.setOrder(order);
 
-            promo.setAvailabilityStatus(false);
+            promo.setAvailabilityStatus(Boolean.TRUE);
             promoCodeRepository.save(promo);
         } else {
             order.setPromoCode(null);
@@ -159,10 +161,8 @@ public class OrderServiceImpl implements OrderService {
         if (order.getClient() == null) {
             throw new BusinessRuleException("Order client is null - cannot persist order without client");
         }
-
+        order.setPayments(new ArrayList<>());
         Order saved = orderRepository.save(order);
-
-        // persist items explicitly if needed
         for (OrderItem it : saved.getItems()) {
             orderItemRepository.save(it);
         }
@@ -184,16 +184,16 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal paid = BigDecimal.ZERO;
         if (order.getPayments() != null) {
             for (var p : order.getPayments()) {
-                if (p.getStatus() != null && p.getStatus().name().equalsIgnoreCase("PAID")) {
+                if (p.getStatus() != null && p.getStatus().equals(PaymentStatus.ENCAISSÉ)) {
                     paid = paid.add(p.getAmountPaid() != null ? p.getAmountPaid() : BigDecimal.ZERO);
                 }
             }
         }
-
         if (paid.compareTo(order.getTotal()) < 0) {
             throw new BusinessRuleException("Payment incomplete for order id: " + orderId);
         }
 
+        // Decrement stock for each item
         for (OrderItem item : order.getItems()) {
             Product product = productRepository.findByIdAndDeletedFalse(item.getProduct().getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + item.getProduct().getId()));
@@ -208,6 +208,7 @@ public class OrderServiceImpl implements OrderService {
             productRepository.save(product);
         }
 
+        // Update client stats
         Client client = order.getClient();
         client.setTotalOrders(client.getTotalOrders() + 1);
         client.setTotalSpent(client.getTotalSpent().add(order.getTotal()));

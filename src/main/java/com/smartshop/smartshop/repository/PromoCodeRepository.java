@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface PromoCodeRepository extends JpaRepository<PromoCode,Long> {
     Boolean existsByCode(String code);
-    Optional<PromoCode> findByCodeAndAvailabilityStatusTrue(String code);
+    Optional<PromoCode> findByCodeAndAvailabilityStatusFalse(String code);
 
 }
