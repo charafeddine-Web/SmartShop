@@ -29,7 +29,9 @@ public class Order {
 
     private BigDecimal tva;
 
-    private BigDecimal promoCode;
+    @OneToOne
+    @JoinColumn(name = "promo_code_id")
+    private PromoCode promoCode;
 
     private BigDecimal total;
 

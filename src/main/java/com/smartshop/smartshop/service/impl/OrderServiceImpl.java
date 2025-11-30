@@ -2,20 +2,14 @@ package com.smartshop.smartshop.service.impl;
 
 import com.smartshop.smartshop.dto.OrderDto;
 import com.smartshop.smartshop.dto.OrderItemDto;
-import com.smartshop.smartshop.entity.Client;
-import com.smartshop.smartshop.entity.Order;
-import com.smartshop.smartshop.entity.OrderItem;
-import com.smartshop.smartshop.entity.Product;
+import com.smartshop.smartshop.entity.*;
 import com.smartshop.smartshop.entity.enums.CustomerTier;
 import com.smartshop.smartshop.entity.enums.OrderStatus;
 import com.smartshop.smartshop.exception.BusinessRuleException;
 import com.smartshop.smartshop.exception.ResourceNotFoundException;
 import com.smartshop.smartshop.mapper.OrderItemMapper;
 import com.smartshop.smartshop.mapper.OrderMapper;
-import com.smartshop.smartshop.repository.ClientRepository;
-import com.smartshop.smartshop.repository.OrderItemRepository;
-import com.smartshop.smartshop.repository.OrderRepository;
-import com.smartshop.smartshop.repository.ProductRepository;
+import com.smartshop.smartshop.repository.*;
 import com.smartshop.smartshop.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +31,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final ClientRepository clientRepository;
+    private final PromoCodeRepository promoCodeRepository;
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
     private final OrderItemRepository orderItemRepository;
@@ -48,6 +43,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDto createOrder(OrderDto orderDto) {
 
+        if (orderDto.getClientId() == null) {
+            throw new com.smartshop.smartshop.exception.BusinessRuleException("Client ID must be provided");
+        }
         Client client = clientRepository.findById(orderDto.getClientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Client not found with id: " + orderDto.getClientId()));
 
@@ -111,19 +109,20 @@ public class OrderServiceImpl implements OrderService {
             discount = discount.add(subtotal.multiply(fidelityPercent));
         }
 
-        // Promo code handling: PROMO-XXXX grants +5% of subtotal
-        BigDecimal promoValue = BigDecimal.ZERO;
-        // We'll accept any non-null promoCode string starting with "PROMO-" as valid
-        // The DTO currently stores promoCode as BigDecimal; tolerate null and ignore otherwise
-        // If there's a need for a string code, a separate field should be added to DTO/entity
-        // Here we check orderDto.getPromoCode() > 0 as an indicator of a code present
-        if (orderDto.getPromoCode() != null && orderDto.getPromoCode().compareTo(BigDecimal.ZERO) > 0) {
-            // Apply additional 5% promo discount
-            promoValue = subtotal.multiply(BigDecimal.valueOf(0.05));
+        if (orderDto.getPromoCode() != null && !orderDto.getPromoCode().isBlank()) {
+            PromoCode promo = promoCodeRepository
+                    .findByCodeAndAvailabilityStatusTrue(orderDto.getPromoCode())
+                    .orElseThrow(() -> new BusinessRuleException("Invalid or unavailable promo code"));
+
+
+            BigDecimal promoValue = subtotal.multiply(BigDecimal.valueOf(0.05));
             discount = discount.add(promoValue);
-            order.setPromoCode(promoValue.setScale(2, RoundingMode.HALF_UP));
+            order.setPromoCode(promo);
+
+            promo.setAvailabilityStatus(false);
+            promoCodeRepository.save(promo);
         } else {
-            order.setPromoCode(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
+            order.setPromoCode(null);
         }
 
         discount = discount.setScale(2, RoundingMode.HALF_UP);
@@ -145,6 +144,12 @@ public class OrderServiceImpl implements OrderService {
 
         // Persist order and items (cascade)
         order.setItems(items);
+
+        // Defensive check: ensure client is set before saving
+        if (order.getClient() == null) {
+            throw new BusinessRuleException("Order client is null - cannot persist order without client");
+        }
+
         Order saved = orderRepository.save(order);
 
         // persist items explicitly if needed

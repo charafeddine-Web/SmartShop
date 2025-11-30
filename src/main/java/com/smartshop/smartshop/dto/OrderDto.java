@@ -13,7 +13,7 @@ public class OrderDto {
 
     private Long id;
 
-    @NotNull(message = "Client ID must be provided")
+//    @NotNull(message = "Client ID must be provided")
     private Long clientId;
 
     @NotNull(message = "Order date must be provided")
@@ -26,11 +26,11 @@ public class OrderDto {
     @DecimalMin(value = "0.0", inclusive = true, message = "Discount must be positive")
     private BigDecimal discount;
 
-    @DecimalMin(value = "0.0", inclusive = true, message = "TVA must be positive")
+    @DecimalMin(value = "0.05", inclusive = true, message = "TVA must be positive")
     private BigDecimal tva;
 
-    @DecimalMin(value = "0.0", inclusive = true, message = "Promo code value must be positive")
-    private BigDecimal promoCode;
+
+    private String  promoCode;
 
     @NotNull(message = "Total must be provided")
     @DecimalMin(value = "0.0", inclusive = true, message = "Total must be positive")
