@@ -6,5 +6,6 @@ public interface PromoCodeService {
 
     public PromoCodeDto generateUniqueCode();
 
+    public PromoCodeDto getByCode(String code);
 
 }

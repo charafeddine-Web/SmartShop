@@ -65,11 +65,21 @@ public class OrderServiceImpl implements OrderService {
             Product product = productRepository.findByIdAndDeletedFalse(itemDto.getProductId())
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + itemDto.getProductId()));
 
+            if (product.getDeleted() != null && product.getDeleted()) {
+                order.setStatus(OrderStatus.REJECTED);
+                order.setRemainingAmount(BigDecimal.ZERO);
+                orderRepository.save(order);
+                throw new BusinessRuleException("Produit supprimé : " + product.getName());
+            }
+
             if (itemDto.getQuantity() == null || itemDto.getQuantity() <= 0) {
                 throw new BusinessRuleException("Quantity must be at least 1 for product id: " + product.getId());
             }
 
             if (product.getStockQuantity() < itemDto.getQuantity()) {
+                order.setStatus(OrderStatus.REJECTED);
+                order.setRemainingAmount(BigDecimal.ZERO);
+                orderRepository.save(order);
                 throw new BusinessRuleException("Insufficient stock for product id: " + product.getId());
             }
 
@@ -184,7 +194,6 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessRuleException("Payment incomplete for order id: " + orderId);
         }
 
-        // Decrement stock for each item
         for (OrderItem item : order.getItems()) {
             Product product = productRepository.findByIdAndDeletedFalse(item.getProduct().getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + item.getProduct().getId()));
@@ -199,7 +208,6 @@ public class OrderServiceImpl implements OrderService {
             productRepository.save(product);
         }
 
-        // Update client stats
         Client client = order.getClient();
         client.setTotalOrders(client.getTotalOrders() + 1);
         client.setTotalSpent(client.getTotalSpent().add(order.getTotal()));
@@ -248,7 +256,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderDto> getOrdersByClientId(Long clientId) {
         List<Order> orders = orderRepository.findAll();
-        // filter by clientId
         return orders.stream()
                 .filter(o -> o.getClient() != null && o.getClient().getId().equals(clientId))
                 .map(orderMapper::toDto)
