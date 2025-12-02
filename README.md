@@ -27,7 +27,7 @@ SmartShop est une **API REST backend** développée pour **MicroTech Maroc**, di
 - **Spring Web** (API REST)
 
 ### Base de Données
-- **PostgreSQL** ou **MySQL**
+- **PostgreSQL**
 
 ### Outils & Librairies
 - **Lombok** - Réduction du code boilerplate
@@ -85,13 +85,10 @@ SmartShop est une **API REST backend** développée pour **MicroTech Maroc**, di
 #### **Client**
 ```java
 - id (Long)
-- nom (String)
 - email (String)
 - tier (CustomerTier)
 - totalOrders (Integer) - Calculé automatiquement
 - totalSpent (BigDecimal) - Calculé automatiquement
-- firstOrderDate (LocalDateTime)
-- lastOrderDate (LocalDateTime)
 ```
 
 #### **Product**
@@ -381,7 +378,7 @@ VIREMENT
 ```bash
 Java 8+
 Maven 3.6+
-PostgreSQL 12+ ou MySQL 8+
+PostgreSQL 12+ 
 Postman ou Swagger
 ```
 
@@ -389,7 +386,7 @@ Postman ou Swagger
 
 1. **Cloner le projet**
 ```bash
-git clone https://github.com/votre-username/smartshop.git
+git clone https://github.com/charafeddine-Web/smartshop.git
 cd smartshop
 ```
 
@@ -431,8 +428,6 @@ mvn test
 ### Couverture de Tests
 - Tests unitaires avec **JUnit 5**
 - Mocking avec **Mockito**
-- Tests des services et repositories
-- Tests des validations métier
 
 ---
 
@@ -442,7 +437,6 @@ mvn test
 ```
 POST   /api/auth/login
 POST   /api/auth/logout
-GET    /api/auth/current-user
 ```
 
 ### Clients
@@ -519,21 +513,19 @@ src/main/java/com/microtech/smartshop/
 │   └── Payment
 │
 ├── dto/               # Data Transfer Objects
-│   ├── request/
-│   └── response/
+│   ├── ClientDto
+|   |enums/    
+│            ├── UserRole
+│            ├── CustomerTier
+│            ├── OrderStatus
+│            ├── PaymentStatus
+│            └── PaymentType
 │
 ├── mapper/            # MapStruct Mappers
 │   ├── ClientMapper
 │   ├── ProductMapper
 │   ├── OrderMapper
 │   └── PaymentMapper
-│
-├── enums/             # Énumérations
-│   ├── UserRole
-│   ├── CustomerTier
-│   ├── OrderStatus
-│   ├── PaymentStatus
-│   └── PaymentType
 │
 ├── exception/         # Exceptions métier
 │   ├── GlobalExceptionHandler
@@ -543,10 +535,8 @@ src/main/java/com/microtech/smartshop/
 │
 ├── config/            # Configuration
 │   ├── AppConfig
-│   └── SwaggerConfig
-│
-└── util/              # Utilitaires
-    └── CalculationUtil
+│   
+
 ```
 
 ---
@@ -554,42 +544,13 @@ src/main/java/com/microtech/smartshop/
 ## 📊 Diagramme de Classes UML
 
 > Voir le fichier `uml-class-diagram.png` dans le dépôt
-
----
-
-## 📋 Suivi de Projet
-
-### JIRA Board
-- **To Do** : Tâches planifiées
-- **In Progress** : En cours de développement
-- **Testing** : En phase de test
-- **Done** : Complété et validé
-
-### Sprint Planning
-- Sprint 1 : Setup + Authentification + Entités
-- Sprint 2 : Clients + Produits + CRUD
-- Sprint 3 : Commandes + Système fidélité
-- Sprint 4 : Paiements multi-moyens
-- Sprint 5 : Tests + Documentation
-
----
-
-## 🎯 Critères de Réussite
-
-✅ L'application démarre sans erreur  
-✅ Connexion DB fonctionnelle  
-✅ Validations métier correctes (stock, remises, TVA)  
-✅ Gestion erreurs cohérente (codes HTTP + JSON)  
-✅ Architecture claire (Controller-Service-Repository-DTO)  
-✅ Comportement conforme aux règles de gestion  
-✅ Tests unitaires couvrent les cas critiques  
-✅ Documentation API complète (Swagger/Postman)  
+ 
 
 ---
 
 ## 👥 Contributeurs
 
-**Développeur** : charaf eddine
+**Développeur** : Charaf Eddine Tbibzat
 **Client** : MicroTech Maroc  
 
 ---
@@ -617,4 +578,4 @@ Ce projet est développé dans un cadre pédagogique pour **MicroTech Maroc**.
 
 ---
 
-**Développé avec ❤️ par l'équipe MicroTech**
+**Développé par  Charaf Eddine Tbibzat **
