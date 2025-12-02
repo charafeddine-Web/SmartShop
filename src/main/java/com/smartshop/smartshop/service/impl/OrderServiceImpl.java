@@ -96,6 +96,29 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setOrder(order);
             items.add(orderItem);
         }
+//
+//        subtotal = subtotal.setScale(2, RoundingMode.HALF_UP);
+//        order.setSubtotal(subtotal);
+//
+//        BigDecimal discount = BigDecimal.ZERO;
+//
+//        if (client.getFidelityLevel() != null) {
+//            BigDecimal fidelityPercent = BigDecimal.ZERO;
+//            switch (client.getFidelityLevel()) {
+//                case SILVER:
+//                    fidelityPercent = BigDecimal.valueOf(0.05);
+//                    break;
+//                case GOLD:
+//                    fidelityPercent = BigDecimal.valueOf(0.10);
+//                    break;
+//                case PLATINUM:
+//                    fidelityPercent = BigDecimal.valueOf(0.15);
+//                    break;
+//                default:
+//                    fidelityPercent = BigDecimal.ZERO;
+//            }
+//            discount = discount.add(subtotal.multiply(fidelityPercent));
+//        }
 
         subtotal = subtotal.setScale(2, RoundingMode.HALF_UP);
         order.setSubtotal(subtotal);
@@ -103,22 +126,36 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal discount = BigDecimal.ZERO;
 
         if (client.getFidelityLevel() != null) {
+
             BigDecimal fidelityPercent = BigDecimal.ZERO;
+
             switch (client.getFidelityLevel()) {
                 case SILVER:
-                    fidelityPercent = BigDecimal.valueOf(0.05);
+                    if (subtotal.compareTo(BigDecimal.valueOf(500)) >= 0) {
+                        fidelityPercent = BigDecimal.valueOf(0.05);
+                    }
                     break;
+
                 case GOLD:
-                    fidelityPercent = BigDecimal.valueOf(0.10);
+                    if (subtotal.compareTo(BigDecimal.valueOf(800)) >= 0) {
+                        fidelityPercent = BigDecimal.valueOf(0.10);
+                    }
                     break;
+
                 case PLATINUM:
-                    fidelityPercent = BigDecimal.valueOf(0.15);
+                    if (subtotal.compareTo(BigDecimal.valueOf(1200)) >= 0) {
+                        fidelityPercent = BigDecimal.valueOf(0.15);
+                    }
                     break;
+
                 default:
                     fidelityPercent = BigDecimal.ZERO;
             }
-            discount = discount.add(subtotal.multiply(fidelityPercent));
+
+            discount = subtotal.multiply(fidelityPercent)
+                    .setScale(2, RoundingMode.HALF_UP);
         }
+
 
         if (orderDto.getPromoCode() != null && !orderDto.getPromoCode().isBlank()) {
             PromoCode promo = promoCodeRepository
@@ -140,29 +177,24 @@ public class OrderServiceImpl implements OrderService {
         discount = discount.setScale(2, RoundingMode.HALF_UP);
         order.setDiscount(discount);
 
-        // Amount HT après remise
         BigDecimal amountAfterDiscount = subtotal.subtract(discount).setScale(2, RoundingMode.HALF_UP);
 
-        // TVA calculée sur montant après remise
         BigDecimal tva = amountAfterDiscount.multiply(taxRate).setScale(2, RoundingMode.HALF_UP);
         order.setTva(tva);
 
-        // Total TTC
         BigDecimal total = amountAfterDiscount.add(tva).setScale(2, RoundingMode.HALF_UP);
         order.setTotal(total);
 
-        // Remaining amount = total (no payments yet)
         order.setRemainingAmount(total);
 
-        // Persist order and items (cascade)
         order.setItems(items);
 
-        // Defensive check: ensure client is set before saving
         if (order.getClient() == null) {
             throw new BusinessRuleException("Order client is null - cannot persist order without client");
         }
         order.setPayments(new ArrayList<>());
         Order saved = orderRepository.save(order);
+
         for (OrderItem it : saved.getItems()) {
             orderItemRepository.save(it);
         }
@@ -180,7 +212,6 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessRuleException("Only PENDING orders can be confirmed");
         }
 
-        // Check payment completeness: sum of payments with status PAID equals total
         BigDecimal paid = BigDecimal.ZERO;
         if (order.getPayments() != null) {
             for (var p : order.getPayments()) {
@@ -193,7 +224,6 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessRuleException("Payment incomplete for order id: " + orderId);
         }
 
-        // Decrement stock for each item
         for (OrderItem item : order.getItems()) {
             Product product = productRepository.findByIdAndDeletedFalse(item.getProduct().getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + item.getProduct().getId()));
@@ -208,17 +238,16 @@ public class OrderServiceImpl implements OrderService {
             productRepository.save(product);
         }
 
-        // Update client stats
         Client client = order.getClient();
         client.setTotalOrders(client.getTotalOrders() + 1);
         client.setTotalSpent(client.getTotalSpent().add(order.getTotal()));
-        // Recalculate fidelity level based on totalSpent (example thresholds)
+
         BigDecimal spent = client.getTotalSpent();
-        if (spent.compareTo(BigDecimal.valueOf(100000)) >= 0) {
+        if (spent.compareTo(BigDecimal.valueOf(15000)) >= 0 || client.getTotalOrders() >= 20) {
             client.setFidelityLevel(CustomerTier.PLATINUM);
-        } else if (spent.compareTo(BigDecimal.valueOf(50000)) >= 0) {
+        } else if (spent.compareTo(BigDecimal.valueOf(5000)) >= 0 || client.getTotalOrders() >= 10) {
             client.setFidelityLevel(CustomerTier.GOLD);
-        } else if (spent.compareTo(BigDecimal.valueOf(20000)) >= 0) {
+        } else if (spent.compareTo(BigDecimal.valueOf(1000)) >= 0 || client.getTotalOrders() >= 3) {
             client.setFidelityLevel(CustomerTier.SILVER);
         } else {
             client.setFidelityLevel(CustomerTier.BASIC);
